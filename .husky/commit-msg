@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+message="$(cat $1)"
+requiredPattern="^(feat|chore|fix|docs|style|refactor|test)((\(([a-z]*)\))|([a-z]*)): (add|cut|fix|bump|make|start|stop|refactor|reformat|optimise|document|merge|update|improve|remove|move) .*$"
+if ! [[ $message =~ $requiredPattern ]];
+then
+  echo "-"
+  echo "-"
+  echo "-"
+  echo "🚨 Wrong commit message! 😕"
+  echo "The commit message must have this format:"
+  echo "<type>(<scope>): <subject>"
+  echo "with the subject following the following pattern (scope is optional, but when specified should be surrounded by parentheses and be at least 5 characters):"
+  echo "<verb in imperative mood> <what was done>"
+  echo "-"
+  echo "Allowed types: feat, chore, fix, docs, style, refactor, test"
+  echo "-"
+  echo "Allowed verbs in imperative mood: add, cut, fix, bump, make, start, stop, refactor, reformat, optimise, document, merge, update, improve"
+  echo "-"
+  echo "Example: 'feat: add footer component'"
+  echo "-"
+  echo "Your commit message was:"
+  echo $message
+  echo "-"
+  echo "For more information, check script in .husky/commit-msg and this gist on github: https://gist.github.com/darenmalfait/fbd384be8fde068e32d0354026b252aa"
+  echo "-"
+  exit 1
+fi

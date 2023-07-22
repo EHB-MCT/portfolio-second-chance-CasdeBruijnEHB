@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "husky": "^8.0.3",
+    "jest": "^29.6.1",
+    "lerna": "^6.6.1"
+  },
+  "scripts": {
+    "validate": "npx lerna run lint"
+  },
+  "name": "portfolio-second-chance-CasdeBruijnEHB",
+  "workspaces": [
+    "packages/*"
+  ]
+}
