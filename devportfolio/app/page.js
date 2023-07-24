@@ -1,13 +1,15 @@
-import Image from 'next/image'
+
 
 export default function Home() {
   return (
-    <main className="flex h-screen w-screen flex-col items-center justify-between p-24 bg-slate-400">
-     <div className='flex justify-center bg-slate-600 text-red'>
-        <p className='text-red'>Look for your song...</p>
-        <input className='w-screen'></input>
-     </div>
-     
+    <main class="flex items-center justify-center h-screen">
+      <div class="bg-slate-300 p-5 w-[50%] rounded-lg">
+        <p class="">Look for your song...</p>
+        <input class="bg-slate-100 rounded-lg p-3" type="text" id="fname" name="fname"></input>
+      </div>
+      <div>
+        
+      </div>
     </main>
   )
 }
