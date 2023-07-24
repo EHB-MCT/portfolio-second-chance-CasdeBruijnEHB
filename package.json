@@ -10,6 +10,14 @@
   },
   "name": "portfolio-second-chance-CasdeBruijnEHB",
   "workspaces": [
-    "packages/*"
-  ]
+    "backend",
+    "devportfolio"
+  ],
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "querystring": "^0.2.1"
+  }
 }
