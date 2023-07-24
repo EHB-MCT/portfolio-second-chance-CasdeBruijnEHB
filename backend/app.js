@@ -18,7 +18,8 @@ var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 let fetchurl = `http://localhost:${port}`;
 //http://127.0.0.1:${port}
 //https://finalwork-26j6.onrender.com
-var redirect_uri = `${fetchurl}/`;
+//var redirect_uri = `${fetchurl}/`;
+var redirect_uri='http://localhost:3000/searchpage'
 
 
 
@@ -86,6 +87,12 @@ app.get('/callback', function(req, res) {
       },
       json: true
     };
+
+    res.redirect('http://localhost:3000/searchpage/#' +
+          querystring.stringify({
+            access_token: access_token,
+            refresh_token: refresh_token
+          }));
   }
 });
 
