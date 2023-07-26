@@ -7,10 +7,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv'); // Import dotenv
 const path = require('path');
+const request = require('request');
 
 /************vars for Spotify*****************/
 const envPath = path.join(__dirname, '.env.local');
 dotenv.config({ path: envPath });
+let accestokenVar="";
 
 var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -19,7 +21,8 @@ let fetchurl = `http://localhost:${port}`;
 //http://127.0.0.1:${port}
 //https://finalwork-26j6.onrender.com
 //var redirect_uri = `${fetchurl}/`;
-var redirect_uri='http://localhost:3000/searchpage'
+//var redirect_uri='http://localhost:3000/searchpage'
+var redirect_uri = `${fetchurl}/callback`;
 
 
 
@@ -50,7 +53,7 @@ app.listen(port, () => {
 
 
 app.get('/login', function(req, res) {
-
+  console.log("login called.")
   var state = generateRandomString(16);
   var scope = 'user-read-private user-read-email';
 
@@ -66,6 +69,7 @@ app.get('/login', function(req, res) {
 
 app.get('/callback', function(req, res) {
 
+  console.log("callback called.")
   var code = req.query.code || null;
   var state = req.query.state || null;
 
@@ -87,17 +91,31 @@ app.get('/callback', function(req, res) {
       },
       json: true
     };
+    
+     request.post(authOptions, function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        console.log("getting token..")
+        var access_token = body.access_token;
+        var refresh_token = body.refresh_token;
+        accestokenVar = access_token;
 
-    res.redirect('http://localhost:3000/searchpage/#' +
+        res.redirect('http://localhost:3000/searchpage/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
           }));
+
+
+      } else {
+        // Handle the error case
+        res.status(response.statusCode).json(body);
+      }
+    });
   }
 });
 
 app.get('/refresh_token', function(req, res) {
-
+ console.log("refresh token called.")
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
@@ -118,3 +136,28 @@ app.get('/refresh_token', function(req, res) {
     }
   });
 });
+
+app.get('/searchitem/:searchitem',function(req,res){
+
+  console.log("Searching item..")
+  console.log(req.params.searchitem)
+  console.log(accestokenVar)
+    var options = {
+            url: 'https://api.spotify.com/v1/search?q=ASAP&type=track&limit=10',
+            headers: { 'Authorization': 'Bearer ' + accestokenVar },
+            json: true
+          };
+          request.get(options, function(error, response, body) {
+          if (error) {
+            console.error(error);
+            return;
+            }
+            if (response.statusCode !== 200) {
+            console.error('Invalid status code:', response.statusCode);
+            return;
+            }
+            res.json(body)
+          });
+
+
+})
