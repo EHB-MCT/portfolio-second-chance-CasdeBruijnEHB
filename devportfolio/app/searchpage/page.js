@@ -18,8 +18,10 @@ export default function Searchpage(){
     async function searchItem(){
         console.log("Searchinggg...: " + searchInput)
 
-         const res = await fetch(`${fetchURL}/searchitem/itemtext`);
-         console.log(res);
+         fetch(`${fetchURL}/searchitem/${searchInput}`)
+        .then(result=>result.json())
+        .then(data=>console.log(data))
+         
     }
 
     return (

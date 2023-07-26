@@ -141,9 +141,9 @@ app.get('/searchitem/:searchitem',function(req,res){
 
   console.log("Searching item..")
   console.log(req.params.searchitem)
-  console.log(accestokenVar)
+  //console.log(accestokenVar)
     var options = {
-            url: 'https://api.spotify.com/v1/search?q=ASAP&type=track&limit=10',
+            url: `https://api.spotify.com/v1/search?q=${req.params.searchitem}&type=track&limit=10`,
             headers: { 'Authorization': 'Bearer ' + accestokenVar },
             json: true
           };
