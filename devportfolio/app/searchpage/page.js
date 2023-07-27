@@ -6,33 +6,35 @@ let fetchURL = "http://localhost:3001";
 export default function Searchpage(){
 
     const [searchInput, setSearchInput]=useState("");
+    const [albums, setAlbums]=useState([]);
 
-/*
-    useEffect(()=>{
-        fetch('url')
-        .then(result=>result.json())
-        .then(data=>console.log(data))
-    },[])
-*/
+    const [selectedAlbum, setSelectedAlbum] = useState(null);
+
+    const handleAlbumClick = (albumId) => {
+        console.log('album click!')
+        console.log(albumId);
+        setSelectedAlbum(albumId);
+    };
 
     async function searchItem(){
         console.log("Searchinggg...: " + searchInput)
-
          fetch(`${fetchURL}/searchitem/${searchInput}`)
         .then(result=>result.json())
-        .then(data=>console.log(data))
-         
+        .then(data=>{
+            //console.log(data.tracks.items[0].album.images[0].url)
+            setAlbums(data.tracks.items);
+        })    
     }
 
     return (
         <>
-         <main className="flex items-center justify-center h-screen">
+         <main className="flex flex-col items-center pt-[10%] h-screen">
             <div className="bg-slate-300 p-5 w-[50%] rounded-lg">
                 <p className="">Look for your song...</p>
                 <input className="bg-slate-100 rounded-lg p-3" type="text" id="fname" name="fname"
                 onKeyDown={event=>{
                     if(event.key=="Enter"){
-                        console.log("Enter Clicked!")
+                        //console.log("Enter Clicked!")
                     }
                 }}
                 onChange={event=>{setSearchInput(event.target.value)}}
@@ -44,11 +46,22 @@ export default function Searchpage(){
                 }}
                 >Look</button>
             </div>
-            <div>
-                <div>
-                    <img src="#" alt="Album picture" width="100" height="100" />
-                    <p>Title</p>
-                </div>
+            <div className="bg-slate-500 flex flex-wrap gap-5 pl-4 pb-2 w-3/6 rounded-md m-2 pt-2">
+                {albums.map((album, i)=>{
+            return(
+                <div key={i} className={`border-solid rounded-md p-2 bg-white ${
+              selectedAlbum === album.id ? 'bg-slate-900' : ''}`}
+                 onClick={() => handleAlbumClick(album.id)}
+                >
+                    <img src= {album.album.images[0].url}
+                    alt="Album picture" 
+                    id={album.id}
+                    width="150" height="150 " />
+                    <p>{album.name}</p>
+                </div>  
+                    )
+                })}
+                
             </div>
         </main>
         </>
