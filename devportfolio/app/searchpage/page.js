@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from 'next/navigation'
 
 let fetchURL = "http://localhost:3001";
 export default function Searchpage(){
-
+    const router = useRouter()
     const [searchInput, setSearchInput]=useState("");
     const [albums, setAlbums]=useState([]);
 
@@ -49,8 +50,8 @@ export default function Searchpage(){
             <div className="bg-slate-500 flex flex-wrap gap-5 pl-4 pb-2 w-3/6 rounded-md m-2 pt-2">
                 {albums.map((album, i)=>{
             return(
-                <div key={i} className={`border-solid rounded-md p-2 bg-white ${
-              selectedAlbum === album.id ? 'bg-slate-900' : ''}`}
+                <div key={i} className={`border-solid rounded-md p-2  ${
+              selectedAlbum === album.id ? 'bg-white' : ''}`}
                  onClick={() => handleAlbumClick(album.id)}
                 >
                     <img src= {album.album.images[0].url}
@@ -61,8 +62,15 @@ export default function Searchpage(){
                 </div>  
                     )
                 })}
-                
             </div>
+            {selectedAlbum && (
+                <button
+                    className="px-4 py-2 rounded-md bg-green-500 text-white mt-2"
+                    onClick={() => router.push(`/searchpage/${selectedAlbum}`)}
+                >
+                    Choose album
+                </button>
+            )}
         </main>
         </>
     )
