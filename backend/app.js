@@ -55,7 +55,7 @@ app.listen(port, () => {
 app.get('/login', function(req, res) {
   console.log("login called.")
   var state = generateRandomString(16);
-  var scope = 'user-read-private user-read-email';
+  var scope = 'streaming user-read-email user-read-private user-library-read user-library-modify user-read-playback-state user-modify-playback-state';
 
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
@@ -160,4 +160,9 @@ app.get('/searchitem/:searchitem',function(req,res){
           });
 
 
+})
+
+app.get('/getaccess',function(req,res){
+
+  res.send(accestokenVar)
 })

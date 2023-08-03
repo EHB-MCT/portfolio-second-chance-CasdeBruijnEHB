@@ -8,7 +8,7 @@ export default function Searchpage(){
     const router = useRouter()
     const [searchInput, setSearchInput]=useState("");
     const [albums, setAlbums]=useState([]);
-
+    
     const [selectedAlbum, setSelectedAlbum] = useState(null);
 
     const handleAlbumClick = (albumId) => {
