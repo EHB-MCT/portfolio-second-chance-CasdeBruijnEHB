@@ -1,13 +1,17 @@
 // Import the required dependencies
 "use client"
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
+import AudioVisualization from '@/components/audiovisnew';
+import LoadScript from 'react-load-script';
 
 
 
 
 export default function Resultpage({ params }) {
   const [accessToken, setAccessToken] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
 
   useEffect(() => {
     async function fetchAccessToken() {
@@ -24,6 +28,7 @@ export default function Resultpage({ params }) {
     fetchAccessToken();
   }, []);
 
+  
 
 
   async function playMusic() {
@@ -33,6 +38,10 @@ export default function Resultpage({ params }) {
     console.log(accessToken)
   }
 
+  const onPlaybackStatusChange = (status) => {
+    setIsPlaying(status.isPlaying);
+  };
+
    const trackURI = `spotify:track:${params.slug}`;
   return (
     <>
@@ -41,7 +50,11 @@ export default function Resultpage({ params }) {
       <SpotifyPlayer
         token={accessToken}
         uris={[trackURI]}
+        callback={onPlaybackStatusChange}
     />
+   {isPlaying && <AudioVisualization />}
     </>
   );
 }
+
+//{isPlaying && <AudioVisualization />}
