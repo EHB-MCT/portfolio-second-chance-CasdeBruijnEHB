@@ -11,7 +11,7 @@ import LoadScript from 'react-load-script';
 export default function Resultpage({ params }) {
   const [accessToken, setAccessToken] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-
+  const [favorited, setIsFavorited]=useState(false);
 
   useEffect(() => {
     async function fetchAccessToken() {
@@ -38,6 +38,10 @@ export default function Resultpage({ params }) {
     console.log(accessToken)
   }
 
+  function favoriteMusic(){
+    setIsFavorited(!favorited)
+  }
+
   const onPlaybackStatusChange = (status) => {
     setIsPlaying(status.isPlaying);
   };
@@ -47,6 +51,10 @@ export default function Resultpage({ params }) {
     <>
       <div>My Post: {params.slug}</div>
       <button onClick={() => playMusic()}>Play song</button>
+      <button onClick={favoriteMusic}>
+      {favorited ? 'Favorited' : 'Save visuals'}
+      </button>
+
       <SpotifyPlayer
         token={accessToken}
         uris={[trackURI]}
