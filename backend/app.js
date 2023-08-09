@@ -8,6 +8,8 @@ const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv'); // Import dotenv
 const path = require('path');
 const request = require('request');
+const { MongoClient } = require('mongodb');
+
 
 /************vars for Spotify*****************/
 const envPath = path.join(__dirname, '.env.local');
@@ -16,6 +18,8 @@ let accestokenVar="";
 
 var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const uri = process.env.ATLAS_URI || "";
+
 
 let fetchurl = `http://localhost:${port}`;
 //http://127.0.0.1:${port}
@@ -41,7 +45,6 @@ function generateRandomString(length) {
 
   return text;
 }
-
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -165,4 +168,36 @@ app.get('/searchitem/:searchitem',function(req,res){
 app.get('/getaccess',function(req,res){
 
   res.send(accestokenVar)
+})
+
+
+/*MONGO CONFIGURATION*/
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri);
+
+console.log("about to connect..")
+
+connectToMongo();
+let conn;
+let db;
+async function connectToMongo() {
+  try {
+    conn = await client.connect();
+    console.log('Connected');
+    db = conn.db("DevPortfolio");
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+app.get('/mongodb',async (req,res)=>{
+
+  let collection = await db.collection("Userdata");
+  let results = await collection.find({})
+    .limit(50)
+    .toArray();
+
+  res.send(results).status(200);
+
 })
