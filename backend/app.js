@@ -10,7 +10,6 @@ const path = require('path');
 const request = require('request');
 const { MongoClient } = require('mongodb');
 
-
 /************vars for Spotify*****************/
 const envPath = path.join(__dirname, '.env.local');
 dotenv.config({ path: envPath });
@@ -201,3 +200,17 @@ app.get('/mongodb',async (req,res)=>{
   res.send(results).status(200);
 
 })
+
+app.get("/mongodb/:userid", async (req, res) => {
+  let collection = await db.collection("Userdata");
+  let result = await collection.findOne({"UserId" : {$regex : `${req.params.userid}`}});;
+  if(!result){
+    console.log("No result found - nothing yet favorited.")
+    console.log(result)
+    res.send("Noting yet favorited.")
+  }else{
+    console.log("User has favorites!")
+    console.log(result)
+    res.send(result)
+  }
+});
