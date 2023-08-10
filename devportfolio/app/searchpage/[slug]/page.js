@@ -12,7 +12,6 @@ export default function Resultpage({ params }) {
   const [accessToken, setAccessToken] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [favorited, setIsFavorited]=useState(false);
-
   useEffect(() => {
     async function fetchAccessToken() {
       console.log("token ophalen");
@@ -38,8 +37,31 @@ export default function Resultpage({ params }) {
     console.log(accessToken)
   }
 
-  function favoriteMusic(){
+  async function favoriteMusic(){
     setIsFavorited(!favorited)
+    console.log("Click favorite...")
+  
+     const data = {
+      favoriteTrack: `${params.slug}`
+    };
+     try {
+      const response = await fetch('http://localhost:3001/mongoAddFavorite/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Server response:', responseData);
+      } else {
+        console.error('Request failed:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
 
   const onPlaybackStatusChange = (status) => {

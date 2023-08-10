@@ -14,6 +14,7 @@ const { MongoClient } = require('mongodb');
 const envPath = path.join(__dirname, '.env.local');
 dotenv.config({ path: envPath });
 let accestokenVar="";
+let userID="";
 
 var client_id = process.env.SPOTIFY_CLIENT_ID;
 var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -31,7 +32,8 @@ var redirect_uri = `${fetchurl}/callback`;
 
 app.use(express.static(__dirname + '/public'))
    .use(cors())
-   .use(cookieParser());
+   .use(cookieParser())
+   .use(bodyParser.json());
 
 
 function generateRandomString(length) {
@@ -100,6 +102,22 @@ app.get('/callback', function(req, res) {
         var access_token = body.access_token;
         var refresh_token = body.refresh_token;
         accestokenVar = access_token;
+        
+        //Get userID
+      fetch('https://api.spotify.com/v1/me', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accestokenVar}`
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            const fetchUserID = data.id;
+            //console.log(`User ID: ${fetchUserID}`);
+            userID=fetchUserID;
+            //Connecting to the DB
+            connectToMongo(userID);
+          })
 
         res.redirect('http://localhost:3000/searchpage/#' +
           querystring.stringify({
@@ -176,22 +194,39 @@ const client = new MongoClient(uri);
 
 console.log("about to connect..")
 
-connectToMongo();
 let conn;
 let db;
-async function connectToMongo() {
+async function connectToMongo(user) {
   try {
+    console.log("user id gekregen:", user)
     conn = await client.connect();
     console.log('Connected');
     db = conn.db("DevPortfolio");
+    //Check if the user already exists in the DB
+  let collection = await db.collection("Userdata");
+   let result = await collection.findOne({"UserId" : {$regex : `${user}`}});
+      if(!result){
+      console.log("No result found - user does not excist yet")
+        //Create the user now
+      let addData = await collection.insertOne({
+      UserId: user,
+      favoriteTrack: []
+      });
+      console.log(addData)
+    }else{
+      console.log("User already excists!")
+      console.log(result)
+    }
+
   } catch (error) {
     console.error('Error:', error);
     throw error;
   }
 }
 
-app.get('/mongodb',async (req,res)=>{
 
+//Sample request voor alle data op te laten (test)
+app.get('/mongodb',async (req,res)=>{
   let collection = await db.collection("Userdata");
   let results = await collection.find({})
     .limit(50)
@@ -201,6 +236,7 @@ app.get('/mongodb',async (req,res)=>{
 
 })
 
+//Sample request voor een userid op te halen (test)
 app.get("/mongodb/:userid", async (req, res) => {
   let collection = await db.collection("Userdata");
   let result = await collection.findOne({"UserId" : {$regex : `${req.params.userid}`}});;
@@ -213,4 +249,44 @@ app.get("/mongodb/:userid", async (req, res) => {
     console.log(result)
     res.send(result)
   }
+});
+
+// Sample request voor een nieuwe track toe te voegen
+app.post("/mongoPost/", async (req, res) => {
+  console.log("posting request...")
+  try{
+    let collection = await db.collection("Userdata");
+    let data = req.body;
+    console.log(data)
+    let result = await collection.insertOne(data);
+    console.log("document inserted ", result)
+    //res.sendStatus(201); // Send a "Created" status
+  } catch (error) {
+    console.error('Error:', error);
+    //res.sendStatus(500); // Send a "Server Error" status
+  } 
+  
+});
+
+// Sample request voor een nieuwe track toe te voegen
+app.post("/mongoAddFavorite/", async (req, res) => {
+  console.log("posting request...")
+  try{
+    let collection = await db.collection("Userdata");
+     let data = req.body;
+     console.log(data)
+     console.log(data.favoriteTrack)
+    const trackID = data.favoriteTrack; 
+    console.log(data);
+    console.log(userID)
+    const userdata = await collection.findOneAndUpdate(
+      { UserId: `${userID}` },
+      { $addToSet: { favoriteTrack: `${trackID}` } },
+      { returnOriginal: false, upsert: true }
+    );
+    //console.log(userdata)
+  } catch (error) {
+    console.error('Error:', error);
+  } 
+  
 });
