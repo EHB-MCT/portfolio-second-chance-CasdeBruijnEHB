@@ -30,17 +30,11 @@ export default function Resultpage({ params }) {
   
 
 
-  async function playMusic() {
-    //const response = await fetch(`http://localhost:3001/play/${params.slug}`);
-    //const data = await response.json();
-    console.log("Click play music");
-    console.log(accessToken)
-  }
+
 
   async function favoriteMusic(){
     setIsFavorited(!favorited)
     console.log("Click favorite...")
-  
      const data = {
       favoriteTrack: `${params.slug}`
     };
@@ -72,7 +66,6 @@ export default function Resultpage({ params }) {
   return (
     <>
       <div>My Post: {params.slug}</div>
-      <button onClick={() => playMusic()}>Play song</button>
       <button onClick={favoriteMusic}>
       {favorited ? 'Favorited' : 'Save visuals'}
       </button>

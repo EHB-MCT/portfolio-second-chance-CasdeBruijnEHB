@@ -178,6 +178,29 @@ app.get('/searchitem/:searchitem',function(req,res){
             }
             res.json(body)
           });
+})
+
+app.get('/searchfavorites/:favoriteids',function(req,res){
+
+  //console.log("Searching item..")
+  //console.log(req.params.favoriteids)
+  //console.log(accestokenVar)
+    var options = {
+            url: `https://api.spotify.com/v1/tracks?ids=${req.params.favoriteids}`,
+            headers: { 'Authorization': 'Bearer ' + accestokenVar },
+            json: true
+          };
+          request.get(options, function(error, response, body) {
+          if (error) {
+            console.error(error);
+            return;
+            }
+            if (response.statusCode !== 200) {
+            console.error('Invalid status code:', response.statusCode);
+            return;
+            }
+            res.json(body)
+          });
 
 
 })
@@ -212,10 +235,10 @@ async function connectToMongo(user) {
       UserId: user,
       favoriteTrack: []
       });
-      console.log(addData)
+      //console.log(addData)
     }else{
       console.log("User already excists!")
-      console.log(result)
+      //console.log(result)
     }
 
   } catch (error) {
@@ -268,7 +291,7 @@ app.post("/mongoPost/", async (req, res) => {
   
 });
 
-// Sample request voor een nieuwe track toe te voegen
+//Requeste voor een nieuw favorietje toe te voegen
 app.post("/mongoAddFavorite/", async (req, res) => {
   console.log("posting request...")
   try{
@@ -289,4 +312,25 @@ app.post("/mongoAddFavorite/", async (req, res) => {
     console.error('Error:', error);
   } 
   
+});
+
+//Request voor all favorite track ID's terug te geven
+app.get('/mongoFavorites',async (req,res)=>{
+  //console.log("mongo favorites called...")
+  let collection = await db.collection("Userdata");
+  const query={"UserId" : {$regex : `${userID}`}}
+  let result = await collection.findOne(query);
+  //console.log(result.favoriteTrack);
+  res.send(result.favoriteTrack);
+
+})
+
+//Request voor een track te deleten uit favorites
+app.delete("/mongoDelete/:id", async (req, res) => {
+  const query = { _id: ObjectId(req.params.id) };
+
+  const collection = db.collection("posts");
+  let result = await collection.deleteOne(query);
+
+  res.send(result).status(200);
 });
