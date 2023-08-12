@@ -326,11 +326,16 @@ app.get('/mongoFavorites',async (req,res)=>{
 })
 
 //Request voor een track te deleten uit favorites
-app.delete("/mongoDelete/:id", async (req, res) => {
-  const query = { _id: ObjectId(req.params.id) };
+app.delete("/mongoDelete/:trackID", async (req, res) => {
+  const trackid=req.params.trackID;
+  const collection = db.collection("Userdata");
+  const userdata = await collection.findOneAndUpdate(
+      { UserId: `${userID}` },
+      { $pull: { favoriteTrack: `${trackid}` } },
+      { returnOriginal: false, upsert: true }
+    );
+  
+ // let result = await collection.deleteOne(query);
 
-  const collection = db.collection("posts");
-  let result = await collection.deleteOne(query);
-
-  res.send(result).status(200);
+  res.json(userdata).status(200);
 });
