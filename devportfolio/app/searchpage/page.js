@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from 'next/navigation'
+import Link from "next/link";
 import ButtonComp from "@/components/buttonComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
@@ -12,24 +12,33 @@ import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 
 let fetchURL = "http://localhost:3001";
 export default function Searchpage(){
-    const router = useRouter()
+
     const [searchInput, setSearchInput]=useState("");
     const [albums, setAlbums]=useState([]);
     const [selectedMenu, setSelectedMenu]=useState("menu")
     const [favoriteAlbums, setFavoriteAlbums]=useState([])
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
+    const [chosenAlbum,setChosenAlbum]=useState({id:'',name:'',artist:'',imageLink:''});
 
      useEffect(() => {
         console.log("useeffect called!")
         getFavorites();
         }, []);
 
-
-    const handleAlbumClick = (albumId) => {
+    const handleAlbumClick = (album) => {
         console.log('album click!')
-        console.log(albumId);
-        setSelectedAlbum(albumId);
+        console.log(album);
+        //Save chosen album data to send through resultpage
+        setChosenAlbum({
+            id: album.id,
+            name: album.name,
+            artist: album.artists[0].name,
+            imageLink: album.album.images[0].url
+        });
+        setSelectedAlbum(album.id);
+        
+        
     };
 
     async function searchItem(){
@@ -110,7 +119,7 @@ export default function Searchpage(){
                 return(
                     <div key={i} className={`border-solid rounded-md p-2  ${
                 selectedAlbum === album.id ? 'bg-white' : ''}`}
-                    onClick={() => handleAlbumClick(album.id)}
+                    onClick={() => handleAlbumClick(album)}
                     >
                         {favoriteTrackIds.includes(album.id)?(
                             <FontAwesomeIcon onClick={()=>{console.log("Unfavorite")}} icon={solidHeart}/>
@@ -121,6 +130,7 @@ export default function Searchpage(){
                         alt="Album picture" 
                         id={album.id}
                         width="150" height="150 " />
+                        <p>{album.artists[0].name}</p>
                         <p>{album.name}</p>
                     </div>  
                         )
@@ -135,12 +145,13 @@ export default function Searchpage(){
                 return(
                     <div key={i} className={`border-solid rounded-md p-2  ${
                 selectedAlbum === album.id ? 'bg-white' : ''}`}
-                    onClick={() => handleAlbumClick(album.id)}
+                    onClick={() => handleAlbumClick(album)}
                     >
                         <img src= {album.album.images[0].url}
                         alt="Album picture" 
                         id={album.id}
                         width="150" height="150 " />
+                        <p>{album.artists[0].name}</p>
                         <p>{album.name}</p>
                     </div>  
                         )
@@ -149,12 +160,15 @@ export default function Searchpage(){
                 </div>
             )}
             {selectedAlbum && (
-                    <button
-                        className="px-4 py-2 rounded-md bg-green-500 text-white mt-2"
-                        onClick={() => router.push(`/searchpage/${selectedAlbum}`)}
-                    >
-                        Choose album
-                    </button>
+                <div>
+                    
+                    <Link className="px-4 py-2 rounded-md bg-green-500 text-white mt-2"
+                         href={{ pathname: `/searchpage/${selectedAlbum}`, query: {
+                            albumname: chosenAlbum.name,
+                            artistName: chosenAlbum.artist,
+                            imageLink: chosenAlbum.imageLink
+                        } }}>Klik</Link>
+                </div> 
                 )}
         </main>
         </>
