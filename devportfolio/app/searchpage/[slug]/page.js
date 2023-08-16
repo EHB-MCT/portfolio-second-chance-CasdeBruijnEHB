@@ -15,8 +15,9 @@ export default function Resultpage({ params }) {
   let fetchURL = "http://localhost:3001";
   const [accessToken, setAccessToken] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [favorited, setIsFavorited]=useState(false);
+  const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
+
   useEffect(() => {
     async function fetchAccessToken() {
       console.log("token ophalen");
@@ -28,11 +29,24 @@ export default function Resultpage({ params }) {
         console.error('Error :', error);
       }
     }
-
     fetchAccessToken();
     getFavorites();
   }, []);
 
+
+  const handleFavoriteToggle = async () => {
+    //Check if the track is liked/unliked first
+    if (favoriteTrackIds.includes(params.slug)) {
+      //Afterwards set the state, remove/add the track from the array, and send the request to database
+      setIsFavorited(false)
+      setFavoriteTrackIds(prevIds => prevIds.filter(id => id !== params.slug));
+      await unfavorite();
+    } else {
+      setIsFavorited(true)
+      setFavoriteTrackIds(prevIds => [...prevIds, params.slug]);
+      await favoriteMusic();
+    }
+  };
   
 
   //Fetch all favorites to check which one is liked
@@ -57,20 +71,15 @@ export default function Resultpage({ params }) {
           fetch(`${fetchURL}/searchfavorites/${songIDString}`)
           .then(result=>result.json())
           .then(data=>{
-              //console.log(data)
-              //console.log(data.tracks)
-              //console.log(data.tracks)
               //Add the ID's to check the albums if they are favorited
               setFavoriteTrackIds(data.tracks.map(track=>track.id));
-              //console.log("getting id's!")
-              //console.log(data.tracks)
-              //setFavoriteAlbums(data.tracks)
+              //Immediately check if track is liked to show it in site
+              setIsFavorited(data.tracks.map(track => track.id).includes(params.slug));
           })    
       }
 
 
   async function favoriteMusic(){
-    setIsFavorited(!favorited)
     console.log("Click favorite...")
      const data = {
       favoriteTrack: `${params.slug}`
@@ -96,7 +105,6 @@ export default function Resultpage({ params }) {
   }
 
   async function unfavorite(){
-    setIsFavorited(!favorited)
     console.log("unfavoriting..")
     try {
       const response = await fetch(`http://localhost:3001/mongoDelete/${params.slug}`, {
@@ -125,12 +133,8 @@ export default function Resultpage({ params }) {
   return (
     <>
       <div>My Post: {params.slug}</div>
-      <button>
-         {favoriteTrackIds.includes(params.slug)?(
-             <FontAwesomeIcon onClick={()=>{unfavorite()}} icon={solidHeart}/>
-               ):(
-              <FontAwesomeIcon onClick={()=>{favoriteMusic()}} icon={regularHeart} />
-            )}
+      <button onClick={handleFavoriteToggle}>
+        {isFavorited ? <FontAwesomeIcon icon={solidHeart} /> : <FontAwesomeIcon icon={regularHeart} />}
       </button>
 
       <SpotifyPlayer
