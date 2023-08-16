@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import AudioVisualization from '@/components/audiovisnew';
-import LoadScript from 'react-load-script';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
-
+import { useSearchParams } from 'next/navigation'
 
 
 
@@ -18,6 +17,18 @@ export default function Resultpage({ params }) {
   const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
 
+  console.log("chosen album...")
+  console.log(params)
+  
+  //Getting the params out the URL that contain track information
+  const searchParams = useSearchParams()
+  const selectedTrackid=params.slug;
+  const albumname = searchParams.get('albumname')
+  const albumartist = searchParams.get('artistName')
+  const imageLink = searchParams.get('imageLink')
+  
+  
+  
   useEffect(() => {
     async function fetchAccessToken() {
       console.log("token ophalen");
@@ -36,14 +47,14 @@ export default function Resultpage({ params }) {
 
   const handleFavoriteToggle = async () => {
     //Check if the track is liked/unliked first
-    if (favoriteTrackIds.includes(params.slug)) {
+    if (favoriteTrackIds.includes(selectedTrackid)) {
       //Afterwards set the state, remove/add the track from the array, and send the request to database
       setIsFavorited(false)
-      setFavoriteTrackIds(prevIds => prevIds.filter(id => id !== params.slug));
+      setFavoriteTrackIds(prevIds => prevIds.filter(id => id !== selectedTrackid));
       await unfavorite();
     } else {
       setIsFavorited(true)
-      setFavoriteTrackIds(prevIds => [...prevIds, params.slug]);
+      setFavoriteTrackIds(prevIds => [...prevIds, selectedTrackid]);
       await favoriteMusic();
     }
   };
@@ -74,7 +85,7 @@ export default function Resultpage({ params }) {
               //Add the ID's to check the albums if they are favorited
               setFavoriteTrackIds(data.tracks.map(track=>track.id));
               //Immediately check if track is liked to show it in site
-              setIsFavorited(data.tracks.map(track => track.id).includes(params.slug));
+              setIsFavorited(data.tracks.map(track => track.id).includes(selectedTrackid));
           })    
       }
 
@@ -82,7 +93,7 @@ export default function Resultpage({ params }) {
   async function favoriteMusic(){
     console.log("Click favorite...")
      const data = {
-      favoriteTrack: `${params.slug}`
+      favoriteTrack: `${selectedTrackid}`
     };
      try {
       const response = await fetch('http://localhost:3001/mongoAddFavorite/', {
@@ -107,7 +118,7 @@ export default function Resultpage({ params }) {
   async function unfavorite(){
     console.log("unfavoriting..")
     try {
-      const response = await fetch(`http://localhost:3001/mongoDelete/${params.slug}`, {
+      const response = await fetch(`http://localhost:3001/mongoDelete/${selectedTrackid}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -129,10 +140,18 @@ export default function Resultpage({ params }) {
     setIsPlaying(status.isPlaying);
   };
 
-   const trackURI = `spotify:track:${params.slug}`;
+   const trackURI = `spotify:track:${selectedTrackid}`;
   return (
     <>
-      <div>My Post: {params.slug}</div>
+      <div className={`border-solid rounded-md p-2`}>
+       <p>My Post: {selectedTrackid}</p>
+       <img src= {imageLink}
+       alt="Album picture" 
+       id={selectedTrackid}
+       width="150" height="150 " />
+       <p>{albumname}</p>
+       <p>{albumartist}</p>
+      </div> 
       <button onClick={handleFavoriteToggle}>
         {isFavorited ? <FontAwesomeIcon icon={solidHeart} /> : <FontAwesomeIcon icon={regularHeart} />}
       </button>
