@@ -9,6 +9,8 @@ const dotenv = require('dotenv'); // Import dotenv
 const path = require('path');
 const request = require('request');
 const { MongoClient } = require('mongodb');
+const fetch = require('cross-fetch');
+
 
 /************vars for Spotify*****************/
 const envPath = path.join(__dirname, '.env.local');
