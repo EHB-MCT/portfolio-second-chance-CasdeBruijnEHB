@@ -6,7 +6,9 @@ const AudioVisualization = () => {
   let audio, fft;
 
   const setup = (p, canvasParentRef) => {
-    p.createCanvas(512, 500).parent(canvasParentRef);
+    const canvasWidth = window.innerWidth;  
+    const canvasHeight = window.innerHeight; 
+    p.createCanvas(canvasWidth, canvasHeight).parent(canvasParentRef);
     audio = new p5.AudioIn();
     audio.start();
     fft = new p5.FFT(0.8,512);

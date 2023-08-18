@@ -143,25 +143,38 @@ export default function Resultpage({ params }) {
    const trackURI = `spotify:track:${selectedTrackid}`;
   return (
     <>
-      <div className={`border-solid rounded-md p-2`}>
-       <p>My Post: {selectedTrackid}</p>
-       <img src= {imageLink}
-       alt="Album picture" 
-       id={selectedTrackid}
-       width="150" height="150 " />
-       <p>{albumname}</p>
-       <p>{albumartist}</p>
-      </div> 
-      <button onClick={handleFavoriteToggle}>
-        {isFavorited ? <FontAwesomeIcon icon={solidHeart} /> : <FontAwesomeIcon icon={regularHeart} />}
-      </button>
+    <main className="flex flex-col items-center pt-[10%] h-screen">
+        <div className="w-[70%]">
+         <div className='justify-center flex'>
+            <div className={`border-solid rounded-md p-2 bg-purple-100 bg-opacity-50 max-w-max`}>
+              <button onClick={handleFavoriteToggle}>
+              {isFavorited ? <div className='flex justify-center items-center p-2'><p className='mr-2'>Unlike</p><FontAwesomeIcon icon={solidHeart} /></div> : <div className='flex justify-center items-center p-2'><p className='mr-2'>Like</p><FontAwesomeIcon icon={regularHeart} /></div>}
+              </button>
+              <img src= {imageLink}
+              alt="Album picture" 
+              id={selectedTrackid}
+              width="300" height="300 " />
+              <div className='p-2'>
+                 <p className="font-bold text-base">{albumname}</p>
+                        <p className="font-light text-opacity-50 text-sm">{albumartist}</p>
+              </div>
+            </div> 
+          </div>
+         
 
-      <SpotifyPlayer
-        token={accessToken}
-        uris={[trackURI]}
-        callback={onPlaybackStatusChange}
-    />
-   {isPlaying && <AudioVisualization />}
+          
+      </div>
+      <div className='absolute left-0 top-0 -z-10'>
+       {isPlaying && <AudioVisualization />}
+       </div>
+   </main>
+   <div className='absolute bottom-0 w-full'>
+   <SpotifyPlayer
+            token={accessToken}
+            uris={[trackURI]}
+            callback={onPlaybackStatusChange}
+        />
+    </div>
     </>
   );
 }

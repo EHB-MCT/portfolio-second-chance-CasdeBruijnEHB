@@ -19,7 +19,8 @@
 
     body {
         margin: 0;
-        background-color: black;
+        background: rgb(13, 19, 47);
+        background: linear-gradient(90deg, rgba(13, 19, 47, 1) 0%, rgba(47, 21, 42, 1) 47%, rgba(56, 18, 59, 1) 83%, rgba(81, 22, 34, 1) 100%);
         color: white;
 
     }
