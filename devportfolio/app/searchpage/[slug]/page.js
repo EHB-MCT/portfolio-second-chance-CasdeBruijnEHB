@@ -27,7 +27,8 @@ export default function Resultpage({ params }) {
   const albumartist = searchParams.get('artistName')
   const imageLink = searchParams.get('imageLink')
   
-  
+
+  const hslColorCode = 'hsl(120, 100%, 50%)';
   
   useEffect(() => {
     async function fetchAccessToken() {
@@ -165,7 +166,7 @@ export default function Resultpage({ params }) {
           
       </div>
       <div className='absolute left-0 top-0 -z-10'>
-       {isPlaying && <AudioVisualization />}
+       {isPlaying && <AudioVisualization  hslColor={hslColorCode} />}
        </div>
    </main>
    <div className='absolute bottom-0 w-full'>
