@@ -16,6 +16,7 @@ export default function Resultpage({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
+  const [domcolor,setDomColor]=useState("");
 
   console.log("chosen album...")
   console.log(params)
@@ -26,9 +27,6 @@ export default function Resultpage({ params }) {
   const albumname = searchParams.get('albumname')
   const albumartist = searchParams.get('artistName')
   const imageLink = searchParams.get('imageLink')
-  
-
-  const hslColorCode = 'hsl(120, 100%, 50%)';
   
   useEffect(() => {
     async function fetchAccessToken() {
@@ -41,10 +39,25 @@ export default function Resultpage({ params }) {
         console.error('Error :', error);
       }
     }
+
+    //Getting the dominant color in the album cover to use for the visuals
+    async function getDomColor(imglink){
+        //have to encode the imageurl to send it through
+          const encodedUrl= encodeURIComponent(imglink)
+      try {
+        const response = await fetch(`http://127.0.0.1:3001/dominantcolor/${encodedUrl}`);
+        const data = await response.json();
+        setDomColor(data); 
+      } catch (error) {
+        console.error('Error :', error);
+      }
+    }
+    getDomColor(searchParams.get('imageLink'));
     fetchAccessToken();
     getFavorites();
   }, []);
 
+  
 
   const handleFavoriteToggle = async () => {
     //Check if the track is liked/unliked first
@@ -166,7 +179,7 @@ export default function Resultpage({ params }) {
           
       </div>
       <div className='absolute left-0 top-0 -z-10'>
-       {isPlaying && <AudioVisualization  hslColor={hslColorCode} />}
+       {isPlaying && <AudioVisualization  hslColor={domcolor}/>}
        </div>
    </main>
    <div className='absolute bottom-0 w-full'>
@@ -180,4 +193,3 @@ export default function Resultpage({ params }) {
   );
 }
 
-//{isPlaying && <AudioVisualization />}

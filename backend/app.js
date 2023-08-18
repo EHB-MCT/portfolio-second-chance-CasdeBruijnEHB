@@ -9,6 +9,7 @@ const dotenv = require('dotenv'); // Import dotenv
 const path = require('path');
 const request = require('request');
 const { MongoClient } = require('mongodb');
+const ColorThief = require('colorthief');
 
 /************vars for Spotify*****************/
 const envPath = path.join(__dirname, '.env.local');
@@ -339,3 +340,27 @@ app.delete("/mongoDelete/:trackID", async (req, res) => {
 
   res.json(userdata).status(200);
 });
+
+
+
+/*********************
+ * Colorthief
+ */
+
+
+app.get('/dominantcolor/:imagelink', (req, res) => {
+ try {
+    const imageUrl = req.params.imagelink;
+    ColorThief.getColor(imageUrl)
+      .then((color) => {
+        //console.log(color)
+        res.json({color});
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+})
+
