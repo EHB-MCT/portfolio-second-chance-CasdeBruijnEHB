@@ -16,6 +16,7 @@ export default function Resultpage({ params }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
+  const [domcolor,setDomColor]=useState("");
 
   console.log("chosen album...")
   console.log(params)
@@ -26,8 +27,6 @@ export default function Resultpage({ params }) {
   const albumname = searchParams.get('albumname')
   const albumartist = searchParams.get('artistName')
   const imageLink = searchParams.get('imageLink')
-  
-  
   
   useEffect(() => {
     async function fetchAccessToken() {
@@ -40,10 +39,25 @@ export default function Resultpage({ params }) {
         console.error('Error :', error);
       }
     }
+
+    //Getting the dominant color in the album cover to use for the visuals
+    async function getDomColor(imglink){
+        //have to encode the imageurl to send it through
+          const encodedUrl= encodeURIComponent(imglink)
+      try {
+        const response = await fetch(`http://127.0.0.1:3001/dominantcolor/${encodedUrl}`);
+        const data = await response.json();
+        setDomColor(data); 
+      } catch (error) {
+        console.error('Error :', error);
+      }
+    }
+    getDomColor(searchParams.get('imageLink'));
     fetchAccessToken();
     getFavorites();
   }, []);
 
+  
 
   const handleFavoriteToggle = async () => {
     //Check if the track is liked/unliked first
@@ -143,27 +157,39 @@ export default function Resultpage({ params }) {
    const trackURI = `spotify:track:${selectedTrackid}`;
   return (
     <>
-      <div className={`border-solid rounded-md p-2`}>
-       <p>My Post: {selectedTrackid}</p>
-       <img src= {imageLink}
-       alt="Album picture" 
-       id={selectedTrackid}
-       width="150" height="150 " />
-       <p>{albumname}</p>
-       <p>{albumartist}</p>
-      </div> 
-      <button onClick={handleFavoriteToggle}>
-        {isFavorited ? <FontAwesomeIcon icon={solidHeart} /> : <FontAwesomeIcon icon={regularHeart} />}
-      </button>
+    <main className="flex flex-col items-center pt-[10%] h-screen">
+        <div className="w-[70%]">
+         <div className='justify-center flex'>
+            <div className={`border-solid rounded-md p-2 bg-purple-100 bg-opacity-50 max-w-max`}>
+              <button onClick={handleFavoriteToggle}>
+              {isFavorited ? <div className='flex justify-center items-center p-2'><p className='mr-2'>Unlike</p><FontAwesomeIcon icon={solidHeart} /></div> : <div className='flex justify-center items-center p-2'><p className='mr-2'>Like</p><FontAwesomeIcon icon={regularHeart} /></div>}
+              </button>
+              <img src= {imageLink}
+              alt="Album picture" 
+              id={selectedTrackid}
+              width="300" height="300 " />
+              <div className='p-2'>
+                 <p className="font-bold text-base">{albumname}</p>
+                        <p className="font-light text-opacity-50 text-sm">{albumartist}</p>
+              </div>
+            </div> 
+          </div>
+         
 
-      <SpotifyPlayer
-        token={accessToken}
-        uris={[trackURI]}
-        callback={onPlaybackStatusChange}
-    />
-   {isPlaying && <AudioVisualization />}
+          
+      </div>
+      <div className='absolute left-0 top-0 -z-10'>
+       {isPlaying && <AudioVisualization  hslColor={domcolor}/>}
+       </div>
+   </main>
+   <div className='absolute bottom-0 w-full'>
+   <SpotifyPlayer
+            token={accessToken}
+            uris={[trackURI]}
+            callback={onPlaybackStatusChange}
+        />
+    </div>
     </>
   );
 }
 
-//{isPlaying && <AudioVisualization />}
