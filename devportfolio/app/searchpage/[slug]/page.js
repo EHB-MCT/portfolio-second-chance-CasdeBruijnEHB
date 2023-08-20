@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { useSearchParams } from 'next/navigation'
-
+import { useRouter } from 'next/navigation'
 
 
 export default function Resultpage({ params }) {
@@ -17,6 +17,8 @@ export default function Resultpage({ params }) {
   const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
   const [domcolor,setDomColor]=useState("");
+  const router = useRouter()
+
 
   
   //Getting the params out the URL that contain track information
@@ -152,6 +154,7 @@ export default function Resultpage({ params }) {
    const trackURI = `spotify:track:${selectedTrackid}`;
   return (
     <>
+    <button className={` absolute bg-white bg-opacity-20 text-white rounded-xl m-5 p-3 text-sm`} onClick={()=>router.back()}>Go back</button>
     <main className="flex flex-col items-center pt-[10%] h-screen">
         <div className="w-[70%]">
          <div className='justify-center flex'>
