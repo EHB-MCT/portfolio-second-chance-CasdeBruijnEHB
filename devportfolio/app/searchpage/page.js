@@ -22,13 +22,10 @@ export default function Searchpage(){
     const [chosenAlbum,setChosenAlbum]=useState({id:'',name:'',artist:'',imageLink:''});
 
      useEffect(() => {
-        console.log("useeffect called!")
         getFavorites();
         }, []);
 
     const handleAlbumClick = (album) => {
-        console.log('album click!')
-        console.log(album);
         //Save chosen album data to send through resultpage
         setChosenAlbum({
             id: album.id,
@@ -42,11 +39,9 @@ export default function Searchpage(){
     };
 
     async function searchItem(){
-        console.log("Searchinggg...: " + searchInput)
          fetch(`${fetchURL}/searchitem/${searchInput}`)
         .then(result=>result.json())
         .then(data=>{
-            //console.log(data.tracks.items[0].album.images[0].url)
             setAlbums(data.tracks.items);
         })    
     }
@@ -72,9 +67,6 @@ export default function Searchpage(){
          fetch(`${fetchURL}/searchfavorites/${songIDString}`)
         .then(result=>result.json())
         .then(data=>{
-            //console.log(data)
-            //console.log(data.tracks)
-            //console.log(data.tracks)
             //Add the ID's to check the albums if they are favorited
             setFavoriteTrackIds(data.tracks.map(track=>track.id));
             setFavoriteAlbums(data.tracks)
@@ -127,9 +119,9 @@ export default function Searchpage(){
                         onClick={() => handleAlbumClick(album)}
                         >
                             {favoriteTrackIds.includes(album.id)?(
-                                <FontAwesomeIcon onClick={()=>{console.log("Unfavorite")}} icon={solidHeart}/>
+                                <FontAwesomeIcon  icon={solidHeart}/>
                                 ):(
-                                <FontAwesomeIcon onClick={()=>{console.log("Favorite")}} icon={regularHeart} />
+                                <FontAwesomeIcon icon={regularHeart} />
                                 )}
                             <img src= {album.album.images[0].url}
                             alt="Album picture" 

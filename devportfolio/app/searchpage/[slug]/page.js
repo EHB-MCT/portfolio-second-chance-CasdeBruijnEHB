@@ -18,8 +18,6 @@ export default function Resultpage({ params }) {
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
   const [domcolor,setDomColor]=useState("");
 
-  console.log("chosen album...")
-  console.log(params)
   
   //Getting the params out the URL that contain track information
   const searchParams = useSearchParams()
@@ -30,7 +28,6 @@ export default function Resultpage({ params }) {
   
   useEffect(() => {
     async function fetchAccessToken() {
-      console.log("token ophalen");
       try {
         const response = await fetch('http://localhost:3001/getaccess');
         const data = await response.text();
@@ -105,7 +102,6 @@ export default function Resultpage({ params }) {
 
 
   async function favoriteMusic(){
-    console.log("Click favorite...")
      const data = {
       favoriteTrack: `${selectedTrackid}`
     };
@@ -130,7 +126,6 @@ export default function Resultpage({ params }) {
   }
 
   async function unfavorite(){
-    console.log("unfavoriting..")
     try {
       const response = await fetch(`http://localhost:3001/mongoDelete/${selectedTrackid}`, {
         method: 'DELETE',

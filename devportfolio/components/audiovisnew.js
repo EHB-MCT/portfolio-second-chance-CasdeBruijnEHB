@@ -48,23 +48,6 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     fft.setInput(audio); 
   };
 
-  /*
-  const draw = (p) => {
-    p.background(0);
-
-    const spectrum = fft.analyze();
-    p.stroke(255);
-    for (var i=0; i<spectrum.length;i++){
-      
-      var amp=spectrum[i];
-      var y = p.map(amp, 0,256, p.height,0);
-      console.log(y)
-      p.line(i, p.height, i, y);
-    }
-    p.stroke(255);
-    p.noFill();
-  };
-  */
  
  const draw = (p) => {
   p.background(230, 30, 23);
@@ -85,7 +68,6 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   let saturation = p.map(avgAmp, 0, 50, 20, 100); 
   let offset= p.map(avgAmp, 0, 100, 0, 1);
   let offsetP1=p.map(avgAmp, 0, 100, 0, 1);
-  console.log("offset: ", offsetP1)
   if(offsetP1>=1){
     offsetP1=1;
   }else if(offsetP1<=0){
@@ -96,13 +78,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     canvasWidth / 2 - 200, canvasHeight / 2 - 200,
     canvasWidth / 2 + 200, canvasHeight / 2 + 200
   );
-    /*
-    console.log(avgAmp)
-    console.log(p.map(avgAmp, 0, 100, 0, 1))
-    console.log(offset)
-    console.log(offset-0.1)
-    console.log(offset+0.1)  
-    */
+
     
   gradient.addColorStop(offsetP1, `hsl(${imageHue}, ${saturation}%, 50%)`);
    //gradient.addColorStop(p.map(avgAmp, 0, 250, 0, 1), `hsl(${hueFirst}, ${saturation}%, 50%)`);
