@@ -10,6 +10,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   let redColorCode=props.hslColor.color[0];
   let greenColorCode=props.hslColor.color[1]
   let blueColorCode=props.hslColor.color[2];
+  console.log(redColorCode,greenColorCode,blueColorCode)
   //because we are using HSL we are converting it with a script found on https://www.30secondsofcode.org/js/s/rgb-to-hsl/
     const RGBToHSL = (r, g, b) => {
     r /= 255;
@@ -31,6 +32,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     ];
   };
   let hslCode=RGBToHSL(redColorCode,greenColorCode,blueColorCode);
+  console.log(hslCode)
   const setup = (p, canvasParentRef) => {
      canvasWidth = window.innerWidth;  
      canvasHeight = window.innerHeight; 
@@ -51,22 +53,21 @@ let audio, fft, canvasHeight, canvasWidth, dim;
  
  const draw = (p) => {
   p.background(230, 30, 23);
-
+  //Analyze the audio data that comes in.
   const spectrum = fft.analyze();
   let ampSum = 0;
-
   for (let i = 0; i < spectrum.length; i++) {
     ampSum += spectrum[i];
   }
-
+  //Calculate the average amplitude of the music
   const avgAmp = ampSum / spectrum.length;
-
-
-  //let hueFirst = p.map(avgAmp, 0, 50, 0, 100);
-  //let hueSecond = p.map(avgAmp, 0, 100, 0, 360);
+ 
+  //Get the HSL values from the album cover
   let imageHue=hslCode[0];
-  let saturation = p.map(avgAmp, 0, 50, 20, 100); 
-  let offset= p.map(avgAmp, 0, 100, 0, 1);
+  let imageSat=hslCode[1]
+  let imageLight=hslCode[2]
+
+  //Set the offset of the gradient to move according to the amplitude. Make sure it stays within 0-1
   let offsetP1=p.map(avgAmp, 0, 100, 0, 1);
   if(offsetP1>=1){
     offsetP1=1;
@@ -79,10 +80,11 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     canvasWidth / 2 + 200, canvasHeight / 2 + 200
   );
 
-    
-  gradient.addColorStop(offsetP1, `hsl(${imageHue}, ${saturation}%, 50%)`);
+  
+  //Add the gradient lines to the canvas.  
+  gradient.addColorStop(offsetP1, `hsl(${imageHue / 2}, ${imageSat / 2}%, 20%)`);
    //gradient.addColorStop(p.map(avgAmp, 0, 250, 0, 1), `hsl(${hueFirst}, ${saturation}%, 50%)`);
-  gradient.addColorStop(1, `hsl(${(imageHue )}, ${saturation}%, 20%)`);
+  gradient.addColorStop(1, `hsl(${(imageHue )}, ${imageSat}%, ${imageLight}%)`);
 
   p.drawingContext.fillStyle = gradient;
   p.rect(0, 0, canvasWidth, canvasHeight);

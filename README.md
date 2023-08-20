@@ -128,3 +128,4 @@ Several sources were consulted to create this project.
 
 - Colorthief https://www.npmjs.com/package/colorthief
 - Convert RGB to HSL https://www.30secondsofcode.org/js/s/rgb-to-hsl/
+- Next Dynamic https://dev.to/vvo/how-to-solve-window-is-not-defined-errors-in-react-and-next-js-5f97
