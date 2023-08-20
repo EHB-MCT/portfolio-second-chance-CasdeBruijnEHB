@@ -2,12 +2,13 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
-import AudioVisualization from '@/components/audiovisnew';
+//import AudioVisualization from '@/components/audiovisnew';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic';
 
 
 export default function Resultpage({ params }) {
@@ -20,7 +21,11 @@ export default function Resultpage({ params }) {
   const router = useRouter()
 
 
-  
+  const DynAudioVisualization = dynamic(
+    () => import('@/components/audiovisnew'),
+    { ssr: false } 
+  );
+    
   //Getting the params out the URL that contain track information
   const searchParams = useSearchParams()
   const selectedTrackid=params.slug;
@@ -177,7 +182,7 @@ export default function Resultpage({ params }) {
           
       </div>
       <div className='absolute left-0 top-0 -z-10'>
-       {isPlaying && <AudioVisualization  hslColor={domcolor}/>}
+       {isPlaying && <DynAudioVisualization hslColor={domcolor} />}
        </div>
    </main>
    <div className='absolute bottom-0 w-full'>
