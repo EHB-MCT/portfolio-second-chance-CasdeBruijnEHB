@@ -94,6 +94,9 @@ docker-compose up
 ```
 Sometimes the deployment, especially connecting with the database, runs a little slower on Docker which could make fetching favorites a bit slower. Refresh your browser if it takes too long!
 
+## Usage
+- Frontend can be visited at http://localhost:3000/
+- Backend can be visited at http://localhost:3001/
 
 ## Technology
 
