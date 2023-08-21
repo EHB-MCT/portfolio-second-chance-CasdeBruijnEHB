@@ -28,17 +28,13 @@ Before you begin, ensure you have the following prerequisites installed on your 
 
 ## Installing
 
-Install all packages with Node Package Manager:
-
-```sh
-   npm i
-```
+- Install Docker Desktop at https://www.docker.com/products/docker-desktop/
 
 ## Running
 
 Follow these steps to run the project:
 
-2.  Frontend: Navigate to the /frontend directory:
+1.  **Frontend**: Navigate to the /frontend directory:
 
 ```sh
   cd /frontend
@@ -50,32 +46,32 @@ Follow these steps to run the project:
    npm install
 ```
 
-- Start the frontend solely
+- (optional) If you want to only run the frontend, you can run
 
 ```sh
    npm run dev
 ```
 
-3. Backend: In a new terminal window/tab, navigate to the /backend directory:
+2. **Backend**: Navigate to the /backend directory:
 
 ```sh
    cd /backend
 ```
 
-- Rename .env.example to .env.local and configure the environment variables, especially Spotify API credentials.
+- Rename .env.example to .env.local and configure the environment variables
 - Install backend dependencies:
 
 ```sh
    npm install
 ```
 
-- Start the node server
+- (Optional) Run the backend alone
 
 ```sh
    node app.js
 ```
 
-4. Lerna - run the front- and backend together with Lerna
+3. (Optional) You can already run both front- and backend together with **Lerna**
    - Go back to the root folder
    ```sh
    cd ..
