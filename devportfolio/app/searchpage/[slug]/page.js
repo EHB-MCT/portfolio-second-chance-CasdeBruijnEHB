@@ -2,12 +2,13 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import SpotifyPlayer from 'react-spotify-web-playback';
-import AudioVisualization from '@/components/audiovisnew';
+//import AudioVisualization from '@/components/audiovisnew';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
 import { useSearchParams } from 'next/navigation'
-
+import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic';
 
 
 export default function Resultpage({ params }) {
@@ -17,10 +18,14 @@ export default function Resultpage({ params }) {
   const [isFavorited, setIsFavorited]=useState(false);
   const [favoriteTrackIds,setFavoriteTrackIds]=useState([]);
   const [domcolor,setDomColor]=useState("");
+  const router = useRouter()
 
-  console.log("chosen album...")
-  console.log(params)
-  
+
+  const DynAudioVisualization = dynamic(
+    () => import('@/components/audiovisnew'),
+    { ssr: false } 
+  );
+    
   //Getting the params out the URL that contain track information
   const searchParams = useSearchParams()
   const selectedTrackid=params.slug;
@@ -30,7 +35,6 @@ export default function Resultpage({ params }) {
   
   useEffect(() => {
     async function fetchAccessToken() {
-      console.log("token ophalen");
       try {
         const response = await fetch('http://localhost:3001/getaccess');
         const data = await response.text();
@@ -105,7 +109,6 @@ export default function Resultpage({ params }) {
 
 
   async function favoriteMusic(){
-    console.log("Click favorite...")
      const data = {
       favoriteTrack: `${selectedTrackid}`
     };
@@ -130,7 +133,6 @@ export default function Resultpage({ params }) {
   }
 
   async function unfavorite(){
-    console.log("unfavoriting..")
     try {
       const response = await fetch(`http://localhost:3001/mongoDelete/${selectedTrackid}`, {
         method: 'DELETE',
@@ -157,6 +159,7 @@ export default function Resultpage({ params }) {
    const trackURI = `spotify:track:${selectedTrackid}`;
   return (
     <>
+    <button className={` absolute bg-white bg-opacity-20 text-white rounded-xl m-5 p-3 text-sm`} onClick={()=>router.back()}>Go back</button>
     <main className="flex flex-col items-center pt-[10%] h-screen">
         <div className="w-[70%]">
          <div className='justify-center flex'>
@@ -179,7 +182,7 @@ export default function Resultpage({ params }) {
           
       </div>
       <div className='absolute left-0 top-0 -z-10'>
-       {isPlaying && <AudioVisualization  hslColor={domcolor}/>}
+       {isPlaying && <DynAudioVisualization hslColor={domcolor} />}
        </div>
    </main>
    <div className='absolute bottom-0 w-full'>

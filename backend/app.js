@@ -59,7 +59,6 @@ app.listen(port, () => {
 
 
 app.get('/login', function(req, res) {
-  console.log("login called.")
   var state = generateRandomString(16);
   var scope = 'streaming user-read-email user-read-private user-library-read user-library-modify user-read-playback-state user-modify-playback-state';
 
@@ -74,8 +73,6 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/callback', function(req, res) {
-
-  console.log("callback called.")
   var code = req.query.code || null;
   var state = req.query.state || null;
 
@@ -100,7 +97,7 @@ app.get('/callback', function(req, res) {
     
      request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
-        console.log("getting token..")
+
         var access_token = body.access_token;
         var refresh_token = body.refresh_token;
         accestokenVar = access_token;
@@ -115,7 +112,6 @@ app.get('/callback', function(req, res) {
           .then(response => response.json())
           .then(data => {
             const fetchUserID = data.id;
-            //console.log(`User ID: ${fetchUserID}`);
             userID=fetchUserID;
             //Connecting to the DB
             connectToMongo(userID);
@@ -137,7 +133,6 @@ app.get('/callback', function(req, res) {
 });
 
 app.get('/refresh_token', function(req, res) {
- console.log("refresh token called.")
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
@@ -161,9 +156,6 @@ app.get('/refresh_token', function(req, res) {
 
 app.get('/searchitem/:searchitem',function(req,res){
 
-  console.log("Searching item..")
-  console.log(req.params.searchitem)
-  //console.log(accestokenVar)
     var options = {
             url: `https://api.spotify.com/v1/search?q=${req.params.searchitem}&type=track&limit=10`,
             headers: { 'Authorization': 'Bearer ' + accestokenVar },
@@ -184,9 +176,6 @@ app.get('/searchitem/:searchitem',function(req,res){
 
 app.get('/searchfavorites/:favoriteids',function(req,res){
 
-  //console.log("Searching item..")
-  //console.log(req.params.favoriteids)
-  //console.log(accestokenVar)
     var options = {
             url: `https://api.spotify.com/v1/tracks?ids=${req.params.favoriteids}`,
             headers: { 'Authorization': 'Bearer ' + accestokenVar },
@@ -217,30 +206,25 @@ app.get('/getaccess',function(req,res){
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri);
 
-console.log("about to connect..")
 
 let conn;
 let db;
 async function connectToMongo(user) {
   try {
-    console.log("user id gekregen:", user)
     conn = await client.connect();
-    console.log('Connected');
+    console.log('Connected to db');
     db = conn.db("DevPortfolio");
     //Check if the user already exists in the DB
   let collection = await db.collection("Userdata");
    let result = await collection.findOne({"UserId" : {$regex : `${user}`}});
       if(!result){
-      console.log("No result found - user does not excist yet")
         //Create the user now
       let addData = await collection.insertOne({
       UserId: user,
       favoriteTrack: []
       });
-      //console.log(addData)
     }else{
-      console.log("User already excists!")
-      //console.log(result)
+      
     }
 
   } catch (error) {
@@ -266,50 +250,35 @@ app.get("/mongodb/:userid", async (req, res) => {
   let collection = await db.collection("Userdata");
   let result = await collection.findOne({"UserId" : {$regex : `${req.params.userid}`}});;
   if(!result){
-    console.log("No result found - nothing yet favorited.")
-    console.log(result)
     res.send("Noting yet favorited.")
   }else{
-    console.log("User has favorites!")
-    console.log(result)
     res.send(result)
   }
 });
 
 // Sample request voor een nieuwe track toe te voegen
 app.post("/mongoPost/", async (req, res) => {
-  console.log("posting request...")
   try{
     let collection = await db.collection("Userdata");
     let data = req.body;
-    console.log(data)
     let result = await collection.insertOne(data);
-    console.log("document inserted ", result)
-    //res.sendStatus(201); // Send a "Created" status
   } catch (error) {
     console.error('Error:', error);
-    //res.sendStatus(500); // Send a "Server Error" status
   } 
   
 });
 
 //Requeste voor een nieuw favorietje toe te voegen
 app.post("/mongoAddFavorite/", async (req, res) => {
-  console.log("posting request...")
   try{
     let collection = await db.collection("Userdata");
      let data = req.body;
-     console.log(data)
-     console.log(data.favoriteTrack)
     const trackID = data.favoriteTrack; 
-    console.log(data);
-    console.log(userID)
     const userdata = await collection.findOneAndUpdate(
       { UserId: `${userID}` },
       { $addToSet: { favoriteTrack: `${trackID}` } },
       { returnOriginal: false, upsert: true }
     );
-    //console.log(userdata)
   } catch (error) {
     console.error('Error:', error);
   } 
@@ -318,11 +287,9 @@ app.post("/mongoAddFavorite/", async (req, res) => {
 
 //Request voor all favorite track ID's terug te geven
 app.get('/mongoFavorites',async (req,res)=>{
-  //console.log("mongo favorites called...")
   let collection = await db.collection("Userdata");
   const query={"UserId" : {$regex : `${userID}`}}
   let result = await collection.findOne(query);
-  //console.log(result.favoriteTrack);
   res.send(result.favoriteTrack);
 
 })
@@ -354,7 +321,6 @@ app.get('/dominantcolor/:imagelink', (req, res) => {
     const imageUrl = req.params.imagelink;
     ColorThief.getColor(imageUrl)
       .then((color) => {
-        //console.log(color)
         res.json({color});
       })
       .catch((error) => {

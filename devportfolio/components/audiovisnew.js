@@ -10,6 +10,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   let redColorCode=props.hslColor.color[0];
   let greenColorCode=props.hslColor.color[1]
   let blueColorCode=props.hslColor.color[2];
+  
   //because we are using HSL we are converting it with a script found on https://www.30secondsofcode.org/js/s/rgb-to-hsl/
     const RGBToHSL = (r, g, b) => {
     r /= 255;
@@ -31,6 +32,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     ];
   };
   let hslCode=RGBToHSL(redColorCode,greenColorCode,blueColorCode);
+  
   const setup = (p, canvasParentRef) => {
      canvasWidth = window.innerWidth;  
      canvasHeight = window.innerHeight; 
@@ -48,72 +50,66 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     fft.setInput(audio); 
   };
 
-  /*
-  const draw = (p) => {
-    p.background(0);
-
-    const spectrum = fft.analyze();
-    p.stroke(255);
-    for (var i=0; i<spectrum.length;i++){
-      
-      var amp=spectrum[i];
-      var y = p.map(amp, 0,256, p.height,0);
-      console.log(y)
-      p.line(i, p.height, i, y);
-    }
-    p.stroke(255);
-    p.noFill();
-  };
-  */
  
  const draw = (p) => {
   p.background(230, 30, 23);
-
-  const spectrum = fft.analyze();
+  //Analyze the audio data that comes in.
+  const fftData = fft.analyze();
   let ampSum = 0;
-
-  for (let i = 0; i < spectrum.length; i++) {
-    ampSum += spectrum[i];
+  for (let i = 0; i < fftData.length; i++) {
+    ampSum += fftData[i];
   }
-
-  const avgAmp = ampSum / spectrum.length;
-
-
-  //let hueFirst = p.map(avgAmp, 0, 50, 0, 100);
-  //let hueSecond = p.map(avgAmp, 0, 100, 0, 360);
+  //Calculate the average amplitude of the music
+  const avgAmp = ampSum / fftData.length;
+ 
+  //Get the HSL values from the album cover
   let imageHue=hslCode[0];
-  let saturation = p.map(avgAmp, 0, 50, 20, 100); 
-  let offset= p.map(avgAmp, 0, 100, 0, 1);
-  let offsetP1=p.map(avgAmp, 0, 100, 0, 1);
-  console.log("offset: ", offsetP1)
-  if(offsetP1>=1){
-    offsetP1=1;
-  }else if(offsetP1<=0){
-    offsetP1=0;
-  }
+  let imageSat=hslCode[1]
+  let imageLight=hslCode[2]
 
   let gradient = p.drawingContext.createLinearGradient(
     canvasWidth / 2 - 200, canvasHeight / 2 - 200,
     canvasWidth / 2 + 200, canvasHeight / 2 + 200
   );
-    /*
-    console.log(avgAmp)
-    console.log(p.map(avgAmp, 0, 100, 0, 1))
-    console.log(offset)
-    console.log(offset-0.1)
-    console.log(offset+0.1)  
-    */
+
+  
+  //Add the gradient lines to the canvas.  Add modulo 360 cause it's the max value
+    let hueStep = imageHue / 3;
+    let gradientstop1 = (imageHue - hueStep) % 360;
+    let gradientstop2 = (imageHue - 2 * hueStep) % 360;
+   
+    //Calculate where the stop will be off the gradient. It will use the averageampl to give a value
+    let offsetP2=manageOffsets(p.map(avgAmp, 10, 40, 0, 0.2)*2);
+    let offsetP3=manageOffsets(p.map(avgAmp, 10, 40, 0.2, 0.4)*2);
+    let offsetP4=manageOffsets(p.map(avgAmp, 10, 40, 0.4, 0.6)*2);
+    //Check if the offset value stays between 0-1
+    function manageOffsets(offset){
+    if(offset>=1){
+          offset=1;
+        }else if(offset<=0){
+          offset=0;
+        }
+        return offset;
+    }
     
-  gradient.addColorStop(offsetP1, `hsl(${imageHue}, ${saturation}%, 50%)`);
-   //gradient.addColorStop(p.map(avgAmp, 0, 250, 0, 1), `hsl(${hueFirst}, ${saturation}%, 50%)`);
-  gradient.addColorStop(1, `hsl(${(imageHue )}, ${saturation}%, 20%)`);
+    //Add the gradients
+  gradient.addColorStop(0, `hsl(${(imageHue)}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP2, `hsl(${(gradientstop1 )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP3, `hsl(${(gradientstop2)}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP4, `hsl(${(imageHue)}, ${imageSat}%, ${imageLight}%)`);
+  
+
 
   p.drawingContext.fillStyle = gradient;
   p.rect(0, 0, canvasWidth, canvasHeight);
 };
+
+
   
-  return <Sketch setup={setup} draw={draw} />;
+  return <Sketch className={"z-20"} setup={setup} draw={draw} />;
 };
+
+ 
 
 
 export default AudioVisualization;
