@@ -62,7 +62,7 @@ Follow these steps to run the project:
    cd /backend
 ```
 
-- Rename .env.example to .env and configure the environment variables, especially Spotify API credentials.
+- Rename .env.example to .env.local and configure the environment variables, especially Spotify API credentials.
 - Install backend dependencies:
 
 ```sh
