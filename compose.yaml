@@ -11,5 +11,10 @@ services:
       - "3000:3000" 
   backend:
     image: backendapp
+    environment:
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+      - ATLAS_URI=${ATLAS_URI}
     ports:
-      - "3001:3001" 
+      - "3001:3001"
