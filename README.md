@@ -96,7 +96,7 @@ Sometimes the deployment, especially connecting with the database, runs a little
 
 ## Usage
 - Frontend can be visited at http://localhost:3000/
-- Backend can be visited at http://localhost:3001/
+- Backend can be visited at http://localhost:3001/ - all endpoints can be found here.
 
 ## Technology
 
