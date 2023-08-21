@@ -10,7 +10,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   let redColorCode=props.hslColor.color[0];
   let greenColorCode=props.hslColor.color[1]
   let blueColorCode=props.hslColor.color[2];
-  //console.log(redColorCode,greenColorCode,blueColorCode)
+  
   //because we are using HSL we are converting it with a script found on https://www.30secondsofcode.org/js/s/rgb-to-hsl/
     const RGBToHSL = (r, g, b) => {
     r /= 255;
@@ -32,7 +32,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     ];
   };
   let hslCode=RGBToHSL(redColorCode,greenColorCode,blueColorCode);
-  //console.log(hslCode)
+  
   const setup = (p, canvasParentRef) => {
      canvasWidth = window.innerWidth;  
      canvasHeight = window.innerHeight; 
@@ -54,26 +54,18 @@ let audio, fft, canvasHeight, canvasWidth, dim;
  const draw = (p) => {
   p.background(230, 30, 23);
   //Analyze the audio data that comes in.
-  const spectrum = fft.analyze();
+  const fftData = fft.analyze();
   let ampSum = 0;
-  for (let i = 0; i < spectrum.length; i++) {
-    ampSum += spectrum[i];
+  for (let i = 0; i < fftData.length; i++) {
+    ampSum += fftData[i];
   }
   //Calculate the average amplitude of the music
-  const avgAmp = ampSum / spectrum.length;
+  const avgAmp = ampSum / fftData.length;
  
   //Get the HSL values from the album cover
   let imageHue=hslCode[0];
   let imageSat=hslCode[1]
   let imageLight=hslCode[2]
-
-  //Set the offset of the gradient to move according to the amplitude. Make sure it stays within 0-1
-  let offsetP1=p.map(avgAmp, 0, 100, 0, 1);
-  if(offsetP1>=1){
-    offsetP1=1;
-  }else if(offsetP1<=0){
-    offsetP1=0;
-  }
 
   let gradient = p.drawingContext.createLinearGradient(
     canvasWidth / 2 - 200, canvasHeight / 2 - 200,
@@ -81,25 +73,15 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   );
 
   
-  //Add the gradient lines to the canvas.  
-   //gradient.addColorStop(p.map(avgAmp, 0, 250, 0, 1), `hsl(${hueFirst}, ${saturation}%, 50%)`);
-  //gradient.addColorStop(offsetP1, `hsl(${imageHue / 2}, ${imageSat / 2}%, 20%)`);
- // gradient.addColorStop(1, `hsl(${(imageHue )}, ${imageSat}%, ${imageLight}%)`);
-    let gradientstop1=0.1;
-    let gradientstop2=0.2;
-    let gradientstop3=0.3;
-    let gradientstop4=0.4;
-    let gradientstop5=0.5;
-    let gradientstop6=0.6;
-    console.log("amp:", avgAmp)
-    //console.log("offset:",offsetP1)
-    let offsetP2=manageOffsets(p.map(avgAmp, 10, 50, 0, 0.3));
-    let offsetP3=manageOffsets(p.map(avgAmp, 10, 50, 0.1, 0.4));
-    let offsetP4=manageOffsets(p.map(avgAmp, 10, 50, 0.2, 0.5));
-    let offsetP5=manageOffsets(p.map(avgAmp, 10, 50, 0.3, 0.6));
-    let offsetP6=manageOffsets(p.map(avgAmp, 10, 50, 0.4, 0.7));
-    //let offsetP7=manageOffsets(p.map(avgAmp, 10, 50, 0.4, 1));
-
+  //Add the gradient lines to the canvas.  Add modulo 360 cause it's the max value
+    let hueStep = imageHue / 3;
+    let gradientstop1 = (imageHue - hueStep) % 360;
+    let gradientstop2 = (imageHue - 2 * hueStep) % 360;
+   
+    //Calculate where the stop will be off the gradient. It will use the averageampl to give a value
+    let offsetP2=manageOffsets(p.map(avgAmp, 10, 40, 0, 0.2)*2);
+    let offsetP3=manageOffsets(p.map(avgAmp, 10, 40, 0.2, 0.4)*2);
+    let offsetP4=manageOffsets(p.map(avgAmp, 10, 40, 0.4, 0.6)*2);
     //Check if the offset value stays between 0-1
     function manageOffsets(offset){
     if(offset>=1){
@@ -110,22 +92,24 @@ let audio, fft, canvasHeight, canvasWidth, dim;
         return offset;
     }
     
-
-  gradient.addColorStop(0, `hsl(${(imageHue -(imageHue*gradientstop1) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(offsetP2, `hsl(${(imageHue -(imageHue*gradientstop2) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(offsetP3, `hsl(${(imageHue -(imageHue*gradientstop3) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(offsetP4, `hsl(${(imageHue -(imageHue*gradientstop4) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(offsetP5, `hsl(${(imageHue -(imageHue*gradientstop5) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(offsetP6, `hsl(${(imageHue -(imageHue*gradientstop6) )}, ${imageSat}%, ${imageLight}%)`);
-  gradient.addColorStop(1, `hsl(${(imageHue )}, ${imageSat}%, ${imageLight}%)`);
+    //Add the gradients
+  gradient.addColorStop(0, `hsl(${(imageHue)}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP2, `hsl(${(gradientstop1 )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP3, `hsl(${(gradientstop2)}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP4, `hsl(${(imageHue)}, ${imageSat}%, ${imageLight}%)`);
+  
 
 
   p.drawingContext.fillStyle = gradient;
   p.rect(0, 0, canvasWidth, canvasHeight);
 };
+
+
   
-  return <Sketch setup={setup} draw={draw} />;
+  return <Sketch className={"z-20"} setup={setup} draw={draw} />;
 };
+
+ 
 
 
 export default AudioVisualization;
