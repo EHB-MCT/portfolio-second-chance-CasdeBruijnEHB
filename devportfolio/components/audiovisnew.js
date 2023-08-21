@@ -10,7 +10,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
   let redColorCode=props.hslColor.color[0];
   let greenColorCode=props.hslColor.color[1]
   let blueColorCode=props.hslColor.color[2];
-  console.log(redColorCode,greenColorCode,blueColorCode)
+  //console.log(redColorCode,greenColorCode,blueColorCode)
   //because we are using HSL we are converting it with a script found on https://www.30secondsofcode.org/js/s/rgb-to-hsl/
     const RGBToHSL = (r, g, b) => {
     r /= 255;
@@ -32,7 +32,7 @@ let audio, fft, canvasHeight, canvasWidth, dim;
     ];
   };
   let hslCode=RGBToHSL(redColorCode,greenColorCode,blueColorCode);
-  console.log(hslCode)
+  //console.log(hslCode)
   const setup = (p, canvasParentRef) => {
      canvasWidth = window.innerWidth;  
      canvasHeight = window.innerHeight; 
@@ -82,9 +82,43 @@ let audio, fft, canvasHeight, canvasWidth, dim;
 
   
   //Add the gradient lines to the canvas.  
-  gradient.addColorStop(offsetP1, `hsl(${imageHue / 2}, ${imageSat / 2}%, 20%)`);
    //gradient.addColorStop(p.map(avgAmp, 0, 250, 0, 1), `hsl(${hueFirst}, ${saturation}%, 50%)`);
+  //gradient.addColorStop(offsetP1, `hsl(${imageHue / 2}, ${imageSat / 2}%, 20%)`);
+ // gradient.addColorStop(1, `hsl(${(imageHue )}, ${imageSat}%, ${imageLight}%)`);
+    let gradientstop1=0.1;
+    let gradientstop2=0.2;
+    let gradientstop3=0.3;
+    let gradientstop4=0.4;
+    let gradientstop5=0.5;
+    let gradientstop6=0.6;
+    console.log("amp:", avgAmp)
+    //console.log("offset:",offsetP1)
+    let offsetP2=manageOffsets(p.map(avgAmp, 10, 50, 0, 0.3));
+    let offsetP3=manageOffsets(p.map(avgAmp, 10, 50, 0.1, 0.4));
+    let offsetP4=manageOffsets(p.map(avgAmp, 10, 50, 0.2, 0.5));
+    let offsetP5=manageOffsets(p.map(avgAmp, 10, 50, 0.3, 0.6));
+    let offsetP6=manageOffsets(p.map(avgAmp, 10, 50, 0.4, 0.7));
+    //let offsetP7=manageOffsets(p.map(avgAmp, 10, 50, 0.4, 1));
+
+    //Check if the offset value stays between 0-1
+    function manageOffsets(offset){
+    if(offset>=1){
+          offset=1;
+        }else if(offset<=0){
+          offset=0;
+        }
+        return offset;
+    }
+    
+
+  gradient.addColorStop(0, `hsl(${(imageHue -(imageHue*gradientstop1) )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP2, `hsl(${(imageHue -(imageHue*gradientstop2) )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP3, `hsl(${(imageHue -(imageHue*gradientstop3) )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP4, `hsl(${(imageHue -(imageHue*gradientstop4) )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP5, `hsl(${(imageHue -(imageHue*gradientstop5) )}, ${imageSat}%, ${imageLight}%)`);
+  gradient.addColorStop(offsetP6, `hsl(${(imageHue -(imageHue*gradientstop6) )}, ${imageSat}%, ${imageLight}%)`);
   gradient.addColorStop(1, `hsl(${(imageHue )}, ${imageSat}%, ${imageLight}%)`);
+
 
   p.drawingContext.fillStyle = gradient;
   p.rect(0, 0, canvasWidth, canvasHeight);
