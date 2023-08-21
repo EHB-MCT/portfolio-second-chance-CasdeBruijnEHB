@@ -234,16 +234,6 @@ async function connectToMongo(user) {
 }
 
 
-//Sample request voor alle data op te laten (test)
-app.get('/mongodb',async (req,res)=>{
-  let collection = await db.collection("Userdata");
-  let results = await collection.find({})
-    .limit(50)
-    .toArray();
-
-  res.send(results).status(200);
-
-})
 
 //Sample request voor een userid op te halen (test)
 app.get("/mongodb/:userid", async (req, res) => {
@@ -256,17 +246,6 @@ app.get("/mongodb/:userid", async (req, res) => {
   }
 });
 
-// Sample request voor een nieuwe track toe te voegen
-app.post("/mongoPost/", async (req, res) => {
-  try{
-    let collection = await db.collection("Userdata");
-    let data = req.body;
-    let result = await collection.insertOne(data);
-  } catch (error) {
-    console.error('Error:', error);
-  } 
-  
-});
 
 //Requeste voor een nieuw favorietje toe te voegen
 app.post("/mongoAddFavorite/", async (req, res) => {

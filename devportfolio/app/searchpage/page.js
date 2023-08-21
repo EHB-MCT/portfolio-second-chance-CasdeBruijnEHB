@@ -178,7 +178,7 @@ export default function Searchpage(){
                             albumname: chosenAlbum.name,
                             artistName: chosenAlbum.artist,
                             imageLink: chosenAlbum.imageLink
-                        } }}>Klik</Link>
+                        } }}>Create visuals</Link>
                 </div> 
                 )}
         </main>
