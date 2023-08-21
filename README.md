@@ -94,8 +94,10 @@ To deploy the application using Docker Compose, follow these steps:
 3. Run the following command to build and start the containers:
 
 ```sh
-docker-compose up --build
+docker-compose up 
 ```
+Sometimes the deployment, especially connecting with the database, runs a little slower on Docker which could make fetching favorites a bit slower. Refresh your browser if it takes too long!
+
 
 ## Technology
 
